@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>문장 정리 웹앱</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <h1>문장 정리 도구</h1>
+      <p>입력한 문장을 설문조사, 메일, 보고서 용 문장으로 깔끔하게 바꿔줍니다.</p>
+    </header>
+
+    <main>
+      <section class="card">
+        <label for="inputText">입력 문장</label>
+        <textarea id="inputText" placeholder="여기에 정리할 문장을 입력하세요."></textarea>
+
+        <label for="mode">정리 유형</label>
+        <select id="mode">
+          <option value="survey">설문조사 정리</option>
+          <option value="email">메일 문장</option>
+          <option value="report">보고서 문장</option>
+        </select>
+
+        <button id="processBtn">정리하기</button>
+      </section>
+
+      <section class="card output-card">
+        <label for="outputText">정리된 결과</label>
+        <pre id="outputText" class="output-text"></pre>
+      </section>
+
+      <section class="card info-card">
+        <h2>설명</h2>
+        <ul>
+          <li><strong>설문조사 정리</strong>는 톤을 통일하고 오타를 바로잡습니다.</li>
+          <li><strong>메일 문장</strong>은 메일에 쓰기 좋은 공손한 문장으로 다듬습니다.</li>
+          <li><strong>보고서 문장</strong>은 간단하고 명확한 문장으로 정리합니다.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

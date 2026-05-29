@@ -10,9 +10,21 @@
 
 ## 실행 방법
 
-1. `index.html` 파일을 브라우저에서 엽니다.
-2. 문장을 입력하고 정리 유형을 선택합니다.
-3. `정리하기` 버튼을 클릭하면 결과가 표시됩니다.
+There are two modes to run the app:
+
+1) Static mode (no AI): open `index.html` in your browser. The app will use local rules to normalize text.
+
+2) AI mode (recommended): run the included server which forwards requests to OpenAI.
+
+	- Copy `.env.example` to `.env` and set `OPENAI_API_KEY`.
+	- Install dependencies and start the server:
+
+```bash
+npm install
+npm start
+```
+
+	- Open http://localhost:3000 in your browser. The client will call `/api/generate` to get AI-enhanced results. If the server has no API key, the client falls back to local rules.
 
 ## 파일 구조
 

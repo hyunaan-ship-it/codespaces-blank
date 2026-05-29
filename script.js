@@ -29,96 +29,126 @@ function processText(text, mode) {
 }
 
 function normalizeSurvey(text) {
-  const typoMap = {
-    '\b없슴\b': '없습니다',
-    '\b업슴\b': '없습니다',
-    '\b업다\b': '없습니다',
-    '\b없음\b': '없습니다',
-    '\b없다\b': '없습니다',
-    '\b좋음\b': '좋았습니다',
-    '\b좋았다\b': '좋았습니다',
-    '\b좋다\b': '좋았습니다',
-    '\b괜찮다\b': '괜찮았습니다',
-    '\b별로다\b': '별로였습니다'
-  };
+  const replacements = [
+    [/없슴/gi, '없습니다'],
+    [/업슴/gi, '없습니다'],
+    [/업다/gi, '없습니다'],
+    [/없음/gi, '없습니다'],
+    [/없다/gi, '없습니다'],
+    [/좋았음/gi, '좋았습니다'],
+    [/좋음/gi, '좋았습니다'],
+    [/좋다/gi, '좋았습니다'],
+    [/좋았다/gi, '좋았습니다'],
+    [/괜찮다/gi, '괜찮았습니다'],
+    [/별로다/gi, '별로였습니다'],
+    [/마치는\s*시간(?:이)?/gi, '마치는 시간이'],
+    [/늦어요/gi, '늦었습니다'],
+    [/끝나요/gi, '끝났습니다'],
+    [/ㅠ+|ㅜ+/g, '']
+  ];
 
-  let normalized = text
-    .replace(/\r/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  Object.keys(typoMap).forEach((pattern) => {
-    const regex = new RegExp(pattern, 'gi');
-    normalized = normalized.replace(regex, typoMap[pattern]);
-  });
-
-  const sentences = normalized
-    .split(/(?<=[.!?])\s+|\n+/)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean)
-    .map((sentence) => {
-      sentence = sentence.replace(/\.$/, '');
-      sentence = sentence.replace(/\?$/, '').replace(/!$/, '');
-      sentence = sentence.replace(/\s+/g, ' ');
-      return sentence + '입니다.';
+  return processLines(text, (line) => {
+    let normalized = line.replace(/\s+/g, ' ').trim();
+    replacements.forEach(([regex, replacement]) => {
+      normalized = normalized.replace(regex, replacement);
     });
 
-  return sentences.join(' ');
+    if (!normalized) {
+      return '';
+    }
+
+    normalized = normalized.replace(/[!?]+$/, '').trim();
+    if (!/(입니다|했습니다|되었습니다|습니다|요)$/i.test(normalized)) {
+      normalized += '입니다';
+    }
+    return normalized.endsWith('.') ? normalized : normalized + '.';
+  });
 }
 
 function normalizeEmail(text) {
-  const cleanText = text.replace(/\r/g, '').trim();
-  const sentences = cleanText
-    .split(/\n+|(?<=[.!?])\s+/)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean)
-    .map((sentence) => {
-      let trimmed = sentence.replace(/[.!?]+$/, '').trim();
-      if (trimmed.length === 0) {
-        return '';
-      }
-      if (/요$/.test(trimmed) || /니다$/.test(trimmed) || /습니다$/.test(trimmed)) {
-        return trimmed + '.';
-      }
-      return trimmed + '입니다.';
-    })
-    .filter(Boolean);
+  const replacements = [
+    [/없슴/gi, '없습니다'],
+    [/업슴/gi, '없습니다'],
+    [/업다/gi, '없습니다'],
+    [/없음/gi, '없습니다'],
+    [/없다/gi, '없습니다'],
+    [/좋았음/gi, '좋았습니다'],
+    [/좋음/gi, '좋았습니다'],
+    [/좋다/gi, '좋았습니다'],
+    [/좋았다/gi, '좋았습니다'],
+    [/마치는\s*시간(?:이)?/gi, '마치는 시간이'],
+    [/늦어요/gi, '늦었습니다'],
+    [/끝나요/gi, '끝났습니다'],
+    [/ㅠ+|ㅜ+/g, '']
+  ];
 
-  if (sentences.length === 0) {
-    return '유효한 문장이 없습니다. 문장을 다시 입력해주세요.';
-  }
+  return processLines(text, (line) => {
+    let normalized = line.replace(/\s+/g, ' ').trim();
+    replacements.forEach(([regex, replacement]) => {
+      normalized = normalized.replace(regex, replacement);
+    });
 
-  const greeting = '안녕하세요.';
-  const body = sentences.join(' ');
-  const closing = '감사합니다.';
+    if (!normalized) {
+      return '';
+    }
 
-  return [greeting, body, closing].join('\n\n');
+    normalized = normalized.replace(/[.!?]+$/, '').trim();
+    if (!/(요|니다|습니다|입니다)$/i.test(normalized)) {
+      normalized += '입니다';
+    }
+    return normalized.endsWith('.') ? normalized : normalized + '.';
+  });
 }
 
 function normalizeReport(text) {
-  const normalized = text
-    .replace(/\r/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const replacements = [
+    [/없슴/gi, '없습니다'],
+    [/업슴/gi, '없습니다'],
+    [/업다/gi, '없습니다'],
+    [/없음/gi, '없습니다'],
+    [/없다/gi, '없습니다'],
+    [/있음/gi, '있습니다'],
+    [/있다/gi, '있습니다'],
+    [/했다/gi, '했습니다'],
+    [/했음/gi, '했습니다'],
+    [/한다/gi, '했습니다'],
+    [/좋았음/gi, '좋았습니다'],
+    [/좋음/gi, '좋았습니다'],
+    [/좋다/gi, '좋았습니다'],
+    [/좋았다/gi, '좋았습니다'],
+    [/마치는\s*시간(?:이)?/gi, '마치는 시간이'],
+    [/늦어요/gi, '늦었습니다'],
+    [/끝나요/gi, '끝났습니다'],
+    [/ㅠ+|ㅜ+/g, '']
+  ];
 
-  const sentences = normalized
-    .split(/(?<=[.!?])\s+|\n+/)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean)
-    .map((sentence) => {
-      let result = sentence
-        .replace(/\b없슴\b|\b업슴\b|\b업다\b|\b없음\b|\b없다\b/gi, '없습니다')
-        .replace(/\b있음\b|\b있다\b/gi, '있습니다')
-        .replace(/\b했다\b|\b했음\b|\b한다\b/gi, '했습니다')
-        .replace(/\s+/g, ' ')
-        .replace(/[.!?]+$/, '')
-        .trim();
-
-      if (!/[.]$/.test(result)) {
-        result += '입니다.';
-      }
-      return result;
+  return processLines(text, (line) => {
+    let normalized = line.replace(/\s+/g, ' ').trim();
+    replacements.forEach(([regex, replacement]) => {
+      normalized = normalized.replace(regex, replacement);
     });
 
-  return sentences.join(' ');
+    if (!normalized) {
+      return '';
+    }
+
+    normalized = normalized.replace(/[.!?]+$/, '').trim();
+    if (!/(입니다|했습니다|되었습니다|습니다)$/i.test(normalized)) {
+      normalized += '입니다';
+    }
+    return normalized.endsWith('.') ? normalized : normalized + '.';
+  });
+}
+
+function processLines(text, transform) {
+  return text
+    .replace(/\r/g, '')
+    .split(/\n/)
+    .map((line) => {
+      if (!line.trim()) {
+        return '';
+      }
+      return transform(line);
+    })
+    .join('\n');
 }
